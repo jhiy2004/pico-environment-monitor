@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Sensors</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <main class="container">
+
+        <header>
+            <h1>Sensor Monitor</h1>
+            <p>Real-time environmental data</p>
+        </header>
+
+        <section class="sensors">
+
+            <div class="sensor-card">
+                <div class="sensor-icon">°C</div>
+
+                <div class="sensor-info">
+                    <span class="sensor-name">Temperature</span>
+                    <span class="sensor-value">
+                        <span id="temperature">38.60</span>
+                        <small>°C</small>
+                    </span>
+                </div>
+            </div>
+
+            <div class="sensor-card">
+                <div class="sensor-icon">%</div>
+
+                <div class="sensor-info">
+                    <span class="sensor-name">Humidity</span>
+                    <span class="sensor-value">
+                        <span id="humidity">12</span>
+                        <small>%</small>
+                    </span>
+                </div>
+            </div>
+
+        </section>
+
+        <footer>
+            <span>Sensor Device</span>
+            <span>Live monitoring</span>
+        </footer>
+
+    </main>
+
+    <script src="index.js"></script>
+
+</body>
+</html>

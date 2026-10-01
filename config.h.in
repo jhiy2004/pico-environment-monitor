@@ -1,0 +1,24 @@
+// config.h.in
+#ifndef CONFIG_H
+#define CONFIG_H
+
+// Definições de variáveis do CMake
+#define OLED_SDA @OLED_SDA@
+#define OLED_SCK @OLED_SCK@
+#define OLED_I2C @OLED_I2C@
+#define OLED_I2C_CLK @OLED_I2C_CLK@
+
+#define SD_SPI @SD_SPI@
+#define SD_SPI_RX @SD_SPI_RX@
+#define SD_SPI_TX @SD_SPI_TX@
+#define SD_SPI_CSn @SD_SPI_CSn@
+#define SD_SPI_SCK @SD_SPI_SCK@
+#define SD_SPI_CLK @SD_SPI_CLK@
+
+#define DHT_PIN @DHT_PIN@
+
+#define ESP01_UART @ESP01_UART@
+#define ESP01_UART_RX @ESP01_UART_RX@
+#define ESP01_UART_TX @ESP01_UART_TX@
+
+#endif // CONFIG_H
