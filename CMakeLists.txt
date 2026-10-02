@@ -135,11 +135,6 @@ target_include_directories(WifiConfig
         lib/WifiConfig/include
 )
 
-target_link_libraries(WifiConfig
-    INTERFACE
-        TempHumidity
-)
-
 # Biblioteca de Wifi (INTEFACE)
 add_library(Wifi INTERFACE)
 
@@ -151,6 +146,7 @@ target_include_directories(Wifi
 target_link_libraries(Wifi
     INTERFACE
         WifiConfig
+        TempHumidity
 )
 
 # Biblioteca de Wifi Fixed Config

@@ -12,8 +12,11 @@
 
 #define PORT 8080
 #define BUFFER_SIZE 1024
+#define SD_PATH "C:\\Users\\jhiy2\\OneDrive\\Desktop\\Projeto Raspberry\\project\\sd-content\\"
 
 static SOCKET server_fd = INVALID_SOCKET;
+static SOCKET new_socket = INVALID_SOCKET;
+
 
 static struct sockaddr_in address;
 static int addrlen = sizeof(address);
@@ -121,51 +124,85 @@ bool InitWifi(wifi_config* config)
     return true;
 }
 
+int getFileHttpHeader(char* filename, long size, char* header, int header_length) {
+    char* ext = strstr(filename, ".");
+    char* contentType;
+    if (strcmp(ext, ".html") == 0) {
+        contentType = "text/html";
+    } else if(strcmp(ext, ".js") == 0) {
+        contentType = "text/javascript";
+    } else if(strcmp(ext, ".css") == 0) {
+        contentType = "text/css";
+    } else {
+        return -1;
+    }
+
+    return snprintf(
+        header,
+        header_length,
+
+        "HTTP/1.1 200 OK\r\n"
+        "Content-Type: %s\r\n"
+        "Content-Length: %ld\r\n"
+        "Connection: close\r\n"
+        "\r\n",
+
+        contentType,
+        size
+    );
+}
+
+int getFileBlock(FILE *file, char* block, int length, int idx) {
+    if (file == NULL || block == NULL || length <= 0 || idx < 0) {
+        return -1;
+    }
+
+    long offset = (long)length * idx;
+
+    if (fseek(file, offset, SEEK_SET) != 0) {
+        return -1;
+    }
+
+    return (int)fread(block, 1, length, file);
+}
+
+int sendAll(const char* buffer, int length){
+    int total = 0;
+
+    while (total < length) {
+        int sent = send(new_socket, buffer + total, length - total, 0);
+
+        if (sent == SOCKET_ERROR)
+            return -1;
+
+        if (sent == 0)
+            return -1;
+
+        total += sent;
+    }
+
+    return total;
+}
+
 void handleRequestFile(char* filename) {
-    char buffer[BUFFER_SIZE]
+    char buffer[BUFFER_SIZE];
     FILE* file = fopen(filename, "rb");
 
     if (file == NULL) {
         printf("File isn't opened");
-        return false;
+        return;
     }
 
     fseek(file, 0, SEEK_END);
-    int length = ftell(file);
+    long size = ftell(file);
     fseek(file, 0, SEEK_SET);
-
-    char* ext = strstr(filename, ".");
-    char* contentType;
-    if (strcmp(ext == ".html") == 0) {
-        contentType = "text/html";
-    } else if(strcmp(ext == ".js") == 0) {
-        contentType = "text/javascript";
-    } else if(strcmp(ext == ".css") == 0) {
-        contentType = "text/css";
-    } else {
-        return false;
-    }
     
     char header[512];
-    int header_length = snprintf(
-        header,
-        sizeof(header),
+    int header_length = getFileHttpHeader(filename, size, header, 512);
 
-        "HTTP/1.1 200 OK\r\n"
-        "Content-Type: %s\r\n"
-        "Content-Length: %zu\r\n"
-        "\r\n"
+    printf("Size: %d\n", size);
 
-        contentType,
-        length
-    );
-
-    int sent = send(
-        new_socket,
-        header,
-        header_length,
-        0
-    );
+    int sent = sendAll(header, header_length);
 
     if (sent == SOCKET_ERROR) {
         printf(
@@ -175,69 +212,145 @@ void handleRequestFile(char* filename) {
 
         closesocket(new_socket);
 
-        return false;
+        fclose(file);
+        return;
     }
 
+    printf("Sent header\n");
+
+    int count = 0;
+    int block_size = 0;
     while(1) {
-        int count = fread(buffer, sizeof(char), BUFFER_SIZE, file);
-        if (count == 0) break;
-        
-        sent = send(new_socket, buffer, count, 0);
+        block_size = getFileBlock(file, buffer, BUFFER_SIZE, count++);
+        printf("Block size: %d\n", block_size);
+
+        if (block_size <= 0) break;
+
+        printf("Sending block %d\n", count);
+        sent = sendAll(buffer, block_size);
     }
+    fclose(file);
 }
-void handleRequestData();
-void handleNotFound();
 
-void dispatcher(char* request) {
-    int count;
-    char* sep1 = strstr(request, " ");
-    char* sep2 = strstr(request + 1, " ");
-
-    char method[10];
-    char resource[50];
-
-    count = sep1 - start;
-    memcpy(method, request, count);
-    method[count] = '\0';
+void handleRequestData(temp_humidity_reading* reading) {
+    char content[512];
+    int content_length = snprintf(
+        content,
+        512,
+        "{"
+            "\"temperature\": %.2f,"
+            "\"humidity\": %.2f"
+        "}",
+        reading->temp_celsius,
+        reading->humidity
+    );
     
-    count = sep2 - (sep1 + 2)
-    memcpy(resource, request, count);
-    method[count] = '\0';
+    char header[512];
+    int header_length = snprintf(
+        header,
+        512,
+        "HTTP/1.1 200 OK\r\n"
+        "Content-Type: application/json\r\n"
+        "Content-Length: %d\r\n"
+        "Connection: close\r\n"
+        "\r\n" ,
+        content_length
+    );
 
-    if (strcmp(method, "GET") == 0) {
-        if (strcmp(resource, "/") == 0 || strcmp(resource, "/index.html") == 0) handleRequestFile("index.html");
-        else if(strcmp(resource, "/index.js") == 0) handleRequestFile("index.js");
-        else if(strcmp(resource, "/style.css") == 0) handleRequestFile("style.css");
-        else if(strcmp(resource, "/sensors") == 0) handleRequestData();
-        else {
+    int sent = sendAll(header, header_length);
 
-        }
+    if (sent == SOCKET_ERROR) {
+        printf(
+            "send failed: %d\n",
+            WSAGetLastError()
+        );
+
+        closesocket(new_socket);
+
+        return;
     }
+
+    sendAll(content, content_length);
 }
 
-
-bool WebPoll() {
-    if (server_fd == INVALID_SOCKET) {
-        printf("Server is not initialized\n");
-        return false;
-    }
-
-    SOCKET new_socket;
-    char page[1024];
-    sprintf(page,
+void handleNotFound() {
+    char content[512];
+    int content_length = snprintf(
+        content,
+        512,
         "<html>"
             "<head>"
                 "<title>Application</title>"
             "</head>"
             "<body>"
-                "<h1>Sensor</h1>"
-                "<h2>Temperature: %.2f</h2>"
-                "<h2>Humidity: %.2f</h2>"
+                "<h1>Not found</h1>"
             "</body>"
-        "</html>",
-        38.6f,
-        83.3f
+        "</html>"
     );
+
+    char header[512];
+    int header_length = snprintf(
+        header,
+        512,
+        "HTTP/1.1 200 OK\r\n"
+        "Content-Type: application/json\r\n"
+        "Content-Length: %d\r\n"
+        "Connection: close\r\n"
+        "\r\n" ,
+        content_length
+    );
+
+    int sent = sendAll(header, header_length);
+
+    if (sent == SOCKET_ERROR) {
+        printf(
+            "send failed: %d\n",
+            WSAGetLastError()
+        );
+
+        closesocket(new_socket);
+
+        return;
+    }
+
+    sendAll(content, content_length);
+};
+
+void dispatcher(char* request, temp_humidity_reading* reading) {
+    printf("************************************* Dispatcher *************************************\n");
+    int count;
+    char* sep1 = strstr(request, " ");
+    char* sep2 = strstr(sep1 + 1, " ");
+
+    char method[10];
+    char resource[50];
+
+    count = sep1 - request;
+    memcpy(method, request, count);
+    method[count] = '\0';
+    
+    count = sep2 - (sep1 + 1);
+    memcpy(resource, (sep1+1), count);
+    resource[count] = '\0';
+
+    printf("Method: %s\n", method);
+    printf("Resource: %s\n", resource);
+
+    if (strcmp(method, "GET") == 0) {
+        if (strcmp(resource, "/") == 0 || strcmp(resource, "/index.html") == 0) handleRequestFile(SD_PATH "index.html");
+        else if(strcmp(resource, "/index.js") == 0) handleRequestFile(SD_PATH "index.js");
+        else if(strcmp(resource, "/style.css") == 0) handleRequestFile(SD_PATH "style.css");
+        else if(strcmp(resource, "/sensors") == 0) handleRequestData(reading);
+        else handleNotFound();
+    }
+}
+
+
+bool WebPoll(temp_humidity_reading* reading) {
+    if (server_fd == INVALID_SOCKET) {
+        printf("Server is not initialized\n");
+        return false;
+    }
 
     // Wait for client
     new_socket = accept(
@@ -268,86 +381,24 @@ bool WebPoll() {
         0
     );
 
-    if (valread == SOCKET_ERROR) {
-
-        printf(
-            "recv failed: %d\n",
-            WSAGetLastError()
-        );
-
+    if (valread <= 0) {
         closesocket(new_socket);
-
-        return false;
-    }
-
-    if (valread == 0) {
-        printf("Client disconnected\n");
-
-        closesocket(new_socket);
-
+        new_socket = INVALID_SOCKET;
         return false;
     }
 
     buffer[valread] = '\0';
 
-    printf(
-        "Received:\n%s\n",
-        buffer
-    );
+    printf("***********************************\n");
+    printf("%s", buffer);
+    printf("***********************************\n");
 
-    // Send HTTP response
-    char response[4096];
-
-    int response_length = snprintf(
-        response,
-        sizeof(response),
-
-        "HTTP/1.1 200 OK\r\n"
-        "Content-Type: text/html\r\n"
-        "Content-Length: %zu\r\n"
-        "Connection: close\r\n"
-        "\r\n"
-        "%s",
-
-        strlen(page),
-        page
-    );
-
-    if (response_length < 0 ||
-        response_length >= sizeof(response)) {
-
-        printf("Response too large\n");
-
-        closesocket(new_socket);
-
-        return false;
-    }
-
-    int sent = send(
-        new_socket,
-        response,
-        response_length,
-        0
-    );
-
-    if (sent == SOCKET_ERROR) {
-
-        printf(
-            "send failed: %d\n",
-            WSAGetLastError()
-        );
-
-        closesocket(new_socket);
-
-        return false;
-    }
-
-    printf(
-        "Sent %d bytes\n",
-        sent
-    );
+    dispatcher(buffer, reading);
 
     closesocket(new_socket);
+    new_socket = INVALID_SOCKET;
 
+    closesocket(new_socket);
+    new_socket = INVALID_SOCKET;
     return true;
 }

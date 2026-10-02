@@ -79,16 +79,15 @@ void testTempHumidity() {
 
 void testWifi() {
     wifi_config config;
-    char page[400];
-
     GetWifiConfig(&config);
 
     temp_humidity_reading reading;
-    GetCurrentTempHumidity(&reading);
+
 
     InitWifi(&config);
     while(1) {
-        WebPoll();
+        GetCurrentTempHumidity(&reading);
+        WebPoll(&reading);
     }
 }
 
