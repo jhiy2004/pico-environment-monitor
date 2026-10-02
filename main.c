@@ -50,7 +50,13 @@ int main() {
         .year = 2026
     };
 
-    temp_humidity_reading reading;
+    temp_humidity_reading reading = {};
+
+    InitUi(buf);        
+    displayInit();
+
+    WriteUi(buf, &options);
+    displayRender(buf, &area);
 
     /*
     if (!fs_init()) {
@@ -59,6 +65,10 @@ int main() {
         options.sd = true;
     }
     */
+
+
+    WriteUi(buf, &options);
+    displayRender(buf, &area);
 
     wifi_config config;
     GetWifiConfig(&config);
@@ -76,9 +86,6 @@ int main() {
     InitTempHumidity();
     logInit();
     //logInfo(&info);
-    InitUi(buf);        
-    displayInit();
-
 
     // Delete the code below later
     //multicore_launch_core1(doSomething);
@@ -124,7 +131,7 @@ int main() {
         WriteUi(buf, &options);
         displayRender(buf, &area);
 
-        if (WebPoll()) {
+        if (WebPoll(&reading)) {
             printf("Client hit");
         }
         
