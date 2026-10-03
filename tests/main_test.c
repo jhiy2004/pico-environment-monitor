@@ -3,7 +3,7 @@
 #include <stdbool.h>
 
 #include "display.h"
-#include "ui.h"
+#include "UI.h"
 #include "TempHumidity.h"
 #include "logger.h"
 #include "Wifi.h"
@@ -19,8 +19,8 @@ void testLogger() {
         .year = 2026
     };
 
-    logInit();
-    logInfo(&info);
+    LogInit();
+    LogInfo(&info);
 }
 
 void testUiWrites() {
@@ -47,8 +47,8 @@ void testUiWrites() {
     InitUi(buf);
     WriteUi(buf, &options);
     
-    displayInit();
-    displayRender(buf, &area);
+    DisplayInit();
+    DisplayRender(buf, &area);
 
     options.sd = true;
     options.wifi = true;
@@ -61,7 +61,7 @@ void testUiWrites() {
     options.year = 1;
 
     WriteUi(buf, &options);
-    displayRender(buf, &area);
+    DisplayRender(buf, &area);
 }
 
 void testTempHumidity() {

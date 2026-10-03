@@ -17,7 +17,7 @@ typedef struct log_info {
 void buildLogHeader(char* header);
 void buildLogMessage(char* line, log_info* info);
 
-void logInit();
-void logInfo(log_info* info);
+void LogInit();
+void LogInfo(log_info* info);
 
 #endif

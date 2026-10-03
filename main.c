@@ -5,8 +5,8 @@
 
 
 
-#include "display.h"
-#include "ui.h"
+#include "Display.h"
+#include "UI.h"
 #include "TempHumidity.h"
 #include "logger.h"
 
@@ -53,10 +53,10 @@ int main() {
     temp_humidity_reading reading = {};
 
     InitUi(buf);        
-    displayInit();
+    DisplayInit();
 
     WriteUi(buf, &options);
-    displayRender(buf, &area);
+    DisplayRender(buf, &area);
 
 
     if (!fs_init()) {
@@ -66,7 +66,7 @@ int main() {
     }
 
     WriteUi(buf, &options);
-    displayRender(buf, &area);
+    DisplayRender(buf, &area);
 
     wifi_config config;
     GetWifiConfig(&config);
@@ -81,7 +81,7 @@ int main() {
     }
 
     InitTempHumidity();
-    logInit();
+    LogInit();
     //logInfo(&info);
 
     // Delete the code below later
@@ -126,7 +126,7 @@ int main() {
         options.umidity = (int) reading.humidity;
 
         WriteUi(buf, &options);
-        displayRender(buf, &area);
+        DisplayRender(buf, &area);
 
         if (WebPoll(&reading)) {
             printf("Client hit");

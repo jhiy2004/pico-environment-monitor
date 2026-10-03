@@ -37,49 +37,57 @@ configure_file(
 
 pico_sdk_init()
 
-# Biblioteca de display
-add_library(ssd1306
-    lib/ssd1306/src/ssd1306.c
+# Biblioteca de Display (INTERFACE)
+add_library(Display INTERFACE)
+
+target_include_directories(Display
+    INTERFACE
+        lib/Display/include
 )
 
-target_include_directories(ssd1306
+# Biblioteca de OLED display
+add_library(SSD1306
+    lib/SSD1306/src/SSD1306.c
+)
+
+target_include_directories(SSD1306
     PRIVATE
-        lib/ssd1306/include
+        lib/SSD1306/include
         ${CMAKE_CURRENT_BINARY_DIR}
-    PUBLIC 
-        lib/display
 )
 
-target_link_libraries(ssd1306
+target_link_libraries(SSD1306
     PRIVATE
         pico_stdlib
-        hardware_i2c 
+        hardware_i2c
+    PUBLIC
+        Display
 )
 
 # Biblioteca de UI
-add_library(ui
-    lib/ui/src/ui.c
+add_library(UI
+    lib/UI/src/UI.c
 )
 
-target_include_directories(ui
+target_include_directories(UI
  
-PUBLIC lib/ui/include
+PUBLIC lib/UI/include
 )
 
 # Biblioteca de logger
-add_library(SDLogger
-    lib/SDLogger/src/SDLogger.c
-    lib/logger/src/logger.c
+add_library(FileLogger
+    lib/FileLogger/src/FileLogger.c
+    lib/Logger/src/Logger.c
 )
 
-target_include_directories(SDLogger
+target_include_directories(FileLogger
     PRIVATE
-        lib/SDLogger/include
+        lib/FileLogger/include
     PUBLIC
-        lib/logger/include
+        lib/Logger/include
 )
 
-target_link_libraries(SDLogger
+target_link_libraries(FileLogger
     PRIVATE
         pico_stdlib
         hardware_spi
@@ -197,10 +205,10 @@ target_link_libraries(main
         pico_multicore
         hardware_rtc
     
-        ssd1306
-        ui
+        SSD1306
+        UI
         DHT11
-        SDLogger
+        FileLogger
 
         WifiFixedConfig
         Esp01

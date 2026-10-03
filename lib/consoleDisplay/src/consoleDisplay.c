@@ -1,5 +1,5 @@
-#include "consoleDisplay.h"
-#include "display.h"
+#include "ConsoleDisplay.h"
+#include "Display.h"
 
 #include <stdio.h>
 #include <stdbool.h>
@@ -11,11 +11,11 @@ static void printLine() {
     printf("\n");
 }
 
-void displayInit() {
+void DisplayInit() {
     printf("Init console display");
 }
 
-void displayRender(uint8_t *buf, render_area *area) {
+void DisplayRender(uint8_t *buf, render_area *area) {
     printLine();
 
     for (int y = 0; y < BUF_HEIGHT * 8; y++) {

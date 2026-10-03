@@ -1,10 +1,10 @@
-#include "SDLogger.h"
+#include "FileLogger.h"
 #include "logger.h"
 
 #include <stdio.h>
 #include <string.h>
 
-void logInit() {
+void LogInit() {
     printf("Initialize SD Logger\n");
 
     FILE* file = fopen(LOG_FILENAME, "r");
@@ -21,7 +21,7 @@ void logInit() {
     }
 }
 
-void logInfo(log_info* info) {
+void LogInfo(log_info* info) {
     char line[100];
 
     buildLogMessage(line, info);

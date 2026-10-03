@@ -14,8 +14,8 @@ typedef struct render_area {
 
 void calc_render_area_buflen(render_area *area);
 
-void displayInit();
-void displayRender(uint8_t *buf, render_area *area);
+void DisplayInit();
+void DisplayRender(uint8_t *buf, render_area *area);
 
 
 #endif

@@ -1,41 +1,20 @@
-#include "consoleLogger.h"
-#include "logger.h"
+#include "ConsoleLogger.h"
+#include "Logger.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 
-void logInit() {
-    FILE* file = fopen(LOG_FILENAME, "r");
-    if (file == NULL) {
-        char header[100];
-        buildLogHeader(header);
+void LogInit() {
+    char header[100];
+    buildLogHeader(header);
         
-        file = fopen(LOG_FILENAME, "w");
-        
-        fputs(header, file);
-        fputs("\n", file);
-
-        fclose(file);
-    }
+    printf("Init Console Logger\n");
+    printf("%s\n", header);    
 }
 
-void logInfo(log_info* info) {
+void LogInfo(log_info* info) {
     char line[100];
 
     buildLogMessage(line, info);
     printf(line);
-
-    FILE* file = fopen(LOG_FILENAME, "r");
-    if (file == NULL) {
-        printf("The logger must be initialized with logInit()\n");
-        return;
-    }
-    fclose(file);
-
-    file = fopen(LOG_FILENAME, "a");
-
-    fputs(line, file);
-    fputs("\n", file);
-
-    fclose(file);
 }

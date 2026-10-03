@@ -1,4 +1,4 @@
-#include "display.h"
+#include "Display.h"
 #include "ssd1306.h"
 
 #include "pico/stdlib.h"
@@ -48,7 +48,7 @@ static void SSD1306_send_buf(uint8_t buf[], int buflen) {
     free(temp_buf);
 }
 
-void displayInit() {
+void DisplayInit() {
     i2c_init(OLED_I2C, OLED_I2C_CLK * 1000);
     gpio_set_function(OLED_SDA, GPIO_FUNC_I2C);
     gpio_set_function(OLED_SCK, GPIO_FUNC_I2C);
@@ -97,7 +97,7 @@ void displayInit() {
     SSD1306_send_cmd_list(cmds, sizeof(cmds)/sizeof((cmds)[0]));
 }
 
-void displayRender(uint8_t *buf, render_area *area) {
+void DisplayRender(uint8_t *buf, render_area *area) {
     // update a portion of the display with a render area
     uint8_t cmds[] = {
         SSD1306_SET_COL_ADDR,

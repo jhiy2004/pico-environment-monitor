@@ -1,4 +1,4 @@
-#include "ui.h"
+#include "UI.h"
 
 #include <assert.h>
 #include <stdlib.h>

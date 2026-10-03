@@ -4,39 +4,50 @@ project(test)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-# Biblioteca de display
-add_library(consoleDisplay
-    ../lib/consoleDisplay/src/consoleDisplay.c
+# Biblioteca de Display (INTERFACE)
+add_library(Display INTERFACE)
+
+target_include_directories(Display
+    INTERFACE
+        ../lib/Display/include
 )
 
-target_include_directories(consoleDisplay
+# Biblioteca de console display
+add_library(ConsoleDisplay
+    ../lib/ConsoleDisplay/src/ConsoleDisplay.c
+)
+
+target_include_directories(ConsoleDisplay
     PRIVATE 
-        ../lib/consoleDisplay/include
+        ../lib/ConsoleDisplay/include
+)
+
+target_link_libraries(ConsoleDisplay
     PUBLIC
-        ../lib/display
+        Display
 )
 
 # Biblioteca de UI
-add_library(ui
-    ../lib/ui/src/ui.c
+add_library(UI
+    ../lib/UI/src/UI.c
 )
 
-target_include_directories(ui
-    PUBLIC ../lib/ui/include
+target_include_directories(UI
+    PUBLIC ../lib/UI/include
 )
 
 
 # Biblioteca de logger
-add_library(consoleLogger
-    ../lib/consoleLogger/src/consoleLogger.c
-    ../lib/logger/src/logger.c
+add_library(ConsoleLogger
+    ../lib/ConsoleLogger/src/ConsoleLogger.c
+    ../lib/Logger/src/Logger.c
 )
 
-target_include_directories(consoleLogger
+target_include_directories(ConsoleLogger
     PRIVATE
-        ../lib/consoleLogger/include
+        ../lib/ConsoleLogger/include
     PUBLIC
-        ../lib/logger/include
+        ../lib/Logger/include
 )
 
 # Biblioteca de temperatura (INTERFACE)
@@ -130,7 +141,7 @@ target_link_libraries(test
         WifiFixedConfig
         MockWifi
         MockTempHumidity
-        ui
-        consoleDisplay
-        consoleLogger
+        UI
+        ConsoleDisplay
+        ConsoleLogger
 )

@@ -28,31 +28,31 @@ project
 │  │  └─ temp_font_spritesheet.bmp
 │  └─ pico_pinout.svg
 ├─ lib
-│  ├─ consoleDisplay
+│  ├─ ConsoleDisplay
 │  │  ├─ include
-│  │  │  └─ consoleDisplay.h
+│  │  │  └─ ConsoleDisplay.h
 │  │  └─ src
-│  │     └─ consoleDisplay.c
-│  ├─ consoleLogger
+│  │     └─ ConsoleDisplay.c
+│  ├─ ConsoleLogger
 │  │  ├─ include
-│  │  │  └─ consoleLogger.h
+│  │  │  └─ ConsoleLogger.h
 │  │  └─ src
-│  │     └─ consoleLogger.c
+│  │     └─ ConsoleLogger.c
 │  ├─ DHT11
 │  │  ├─ include
 │  │  │  └─ DHT11.h
 │  │  └─ src
 │  │     └─ DHT11.c
-│  ├─ display
-│  │  └─ display.h
+│  ├─ Display
+│  │  └─ Display.h
 │  ├─ Esp01
 │  │  └─ src
 │  │     └─ Esp01.c
-│  ├─ logger
+│  ├─ Logger
 │  │  ├─ include
-│  │  │  └─ logger.h
+│  │  │  └─ Logger.h
 │  │  └─ src
-│  │     └─ logger.c
+│  │     └─ Logger.c
 │  ├─ MockTempHumidity
 │  │  └─ src
 │  │     └─ MockTempHumidity.c
@@ -61,29 +61,29 @@ project
 │  │  └─ src
 │  │     └─ MockWifi.c
 │  ├─ pico-vfs
-│  ├─ SDLogger
+│  ├─ FileLogger
 │  │  ├─ include
-│  │  │  └─ SDLogger.h
+│  │  │  └─ FileLogger.h
 │  │  └─ src
-│  │     └─ SDLogger.c
-│  ├─ ssd1306
+│  │     └─ FileLogger.c
+│  ├─ SSD1306
 │  │  ├─ include
-│  │  │  └─ ssd1306.h
+│  │  │  └─ SSD1306.h
 │  │  └─ src
-│  │     └─ ssd1306.c
+│  │     └─ SSD1306.c
 │  ├─ TempHumidity
 │  │  ├─ include
 │  │  │  └─ TempHumidity.h
 │  │  └─ src
-│  ├─ ui
+│  ├─ UI
 │  │  ├─ include
 │  │  │  ├─ full_screen.h
 │  │  │  ├─ on_off_icons.h
 │  │  │  ├─ small_numbers.h
 │  │  │  ├─ temp_numbers.h
-│  │  │  └─ ui.h
+│  │  │  └─ UI.h
 │  │  └─ src
-│  │     └─ ui.c
+│  │     └─ UI.c
 │  ├─ Wifi
 │  │  └─ include
 │  │     └─ Wifi.h
@@ -118,11 +118,11 @@ project
 
 * **UI:** Stores and manages the UI elements and their current values, including temperature, humidity, Wi-Fi status, SD card status, and date and time.
 
-* **Logger:** An abstract class that defines the logging interface and common functionality shared by concrete logger implementations.
+* **Logger:** An abstract class that defines the logging interface and common functionality shared by concrete Logger implementations.
 
 * **ConsoleLogger:** A concrete implementation of `Logger` that outputs log information using `printf`. It is intended for testing purposes.
 
-* **SDLogger:** A concrete implementation of `Logger` that stores log information in a CSV file on the SD card.
+* **FileLogger:** A concrete implementation of `Logger` that stores log information in a CSV file on the SD card.
 
 * **Display:** An interface that defines the display operations implemented by concrete display classes.
 
@@ -153,11 +153,11 @@ The `tests/` folder contains a CMake project used to build the test program. The
 
 The build generates several static libraries used by the tests:
 
-* `ui.lib`
-* `consoleDisplay.lib`
+* `UI.lib`
+* `ConsoleDisplay.lib`
 * `WifiFixedConfig.lib`
 * `MockWifi.lib`
-* `consoleLogger.lib`
+* `ConsoleLogger.lib`
 * `MockTempHumidity.lib`
 
 To configure and build the test project, run:
@@ -178,11 +178,11 @@ The project root folder contains a CMake project used to build the firmware for 
 
 The build generates several static libraries used by the application:
 
-* `libui.a`
-* `libssd1306.a`
+* `libUI.a`
+* `libSSD1306.a`
 * `libWifiFileConfig.a`
 * `libEsp01.a`
-* `libSDLogger.a`
+* `libFileLogger.a`
 * `libDHT11.a`
 
 Before configuring the project, load the Pico SDK environment by running:
