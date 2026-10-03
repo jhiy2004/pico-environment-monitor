@@ -58,14 +58,12 @@ int main() {
     WriteUi(buf, &options);
     displayRender(buf, &area);
 
-    /*
+
     if (!fs_init()) {
         printf("Failed to mount vfs filesystem");
     } else {
         options.sd = true;
     }
-    */
-
 
     WriteUi(buf, &options);
     displayRender(buf, &area);
@@ -73,7 +71,6 @@ int main() {
     wifi_config config;
     GetWifiConfig(&config);
 
-    sleep_ms(5000);
     if(InitWifi(&config)) {
         printf("Wifi Initialization completed\n");
         options.wifi = true;
